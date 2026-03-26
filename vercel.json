@@ -1,4 +1,7 @@
 {
+  "buildCommand": "",
+  "outputDirectory": "",
+  "framework": null,
   "rewrites": [
     { "source": "/api/read-past-life", "destination": "/api/read-past-life" }
   ]
