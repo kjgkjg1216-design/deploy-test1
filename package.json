@@ -1,0 +1,15 @@
+{
+  "name": "past-life-reader",
+  "version": "1.0.0",
+  "description": "전생 리더기 - 당신의 전생을 알려드립니다",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "openai": "^4.67.0"
+  }
+}
