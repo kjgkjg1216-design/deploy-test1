@@ -1,8 +1,5 @@
-const OpenAI = require('openai');
 const fs = require('fs');
 const path = require('path');
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const dataDir = path.join(__dirname, '..', 'data');
 const occupations = JSON.parse(fs.readFileSync(path.join(dataDir, 'occupations.json'), 'utf-8'));
@@ -57,14 +54,28 @@ module.exports = async function handler(req, res) {
 7. 반말로 친근하게 작성`;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 800,
-      temperature: 1.0,
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 800,
+        temperature: 1.0,
+      }),
     });
 
-    const story = completion.choices[0].message.content;
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('OpenAI API error:', data);
+      return res.status(500).json({ error: 'AI 스토리 생성 중 오류가 발생했습니다.', detail: data.error?.message });
+    }
+
+    const story = data.choices[0].message.content;
 
     res.json({
       name,
@@ -76,7 +87,7 @@ module.exports = async function handler(req, res) {
       story,
     });
   } catch (err) {
-    console.error('OpenAI API error:', err.message, err.status, err.code);
+    console.error('Error:', err.message);
     res.status(500).json({ error: 'AI 스토리 생성 중 오류가 발생했습니다.', detail: err.message });
   }
 };
